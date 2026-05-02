@@ -9,7 +9,7 @@ import Footer from "@/components/Footer";
 import IPhoneFrame from "@/components/iPhoneFrame";
 import WallpaperCard from "@/components/WallpaperCard";
 import { Download, ArrowLeft, Tag, X, Maximize2 } from "lucide-react";
-import { stringToTags, formatDate, formatCount, formatFileSize, getApiUrl, getDisplayUrl } from "@/lib/utils";
+import { stringToTags, formatDate, formatCount, formatFileSize, getApiUrl } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Wallpaper, ApiResponse } from "@/lib/types";
 
@@ -148,7 +148,6 @@ export default function WallpaperDetailPage() {
   }
 
   const tags = stringToTags(wallpaper.tags);
-  const displayUrl = getDisplayUrl(wallpaper);
   const isPortrait = wallpaper.height > wallpaper.width && wallpaper.width > 0;
 
   return (
@@ -174,9 +173,9 @@ export default function WallpaperDetailPage() {
               {isPortrait ? (
                 <IPhoneFrame onClick={() => setShowPreview(true)}>
                   <div className="relative w-full h-full cursor-zoom-in group">
-                    {displayUrl ? (
+                    {wallpaper.url ? (
                       <Image
-                        src={displayUrl}
+                        src={wallpaper.url}
                         alt={wallpaper.title}
                         fill
                         sizes="320px"
@@ -198,9 +197,9 @@ export default function WallpaperDetailPage() {
                   className="relative overflow-hidden rounded-2xl bg-muted cursor-zoom-in group aspect-video"
                   onClick={() => setShowPreview(true)}
                 >
-                  {displayUrl ? (
+                  {wallpaper.url ? (
                     <Image
-                      src={displayUrl}
+                      src={wallpaper.url}
                       alt={wallpaper.title}
                       fill
                       sizes="(max-width: 1024px) 100vw, 60vw"
