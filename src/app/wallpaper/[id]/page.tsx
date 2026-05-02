@@ -181,7 +181,7 @@ export default function WallpaperDetailPage() {
                       alt={wallpaper.title}
                       fill
                       sizes="(max-width: 1024px) 100vw, 60vw"
-                      className="object-contain transition-transform duration-300 group-hover:scale-[1.02]"
+                      className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
                       priority
                     />
                   ) : (
