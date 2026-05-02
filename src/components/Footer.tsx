@@ -18,7 +18,7 @@ export default function Footer() {
               关于
             </Link>
             <p className="text-xs text-text-tertiary">
-              © 2026 HDwal
+              版权所有 © 2026 HDwal
             </p>
           </div>
         </div>
