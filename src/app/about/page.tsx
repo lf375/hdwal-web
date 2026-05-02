@@ -58,7 +58,7 @@ export default function AboutPage() {
             <ul className="space-y-2 text-text-secondary">
               <li className="flex items-start gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-accent mt-1.5 flex-shrink-0" />
-                <span>Coze 工作流 + AI 绘图，自动生成壁纸</span>
+                <span>Cloudflare 边缘计算，全球加速访问</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-accent mt-1.5 flex-shrink-0" />
