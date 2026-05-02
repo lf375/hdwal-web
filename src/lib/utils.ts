@@ -49,21 +49,18 @@ export function stringToTags(str: string): string[] {
 }
 
 export const TAGS = [
-  "风景",
-  "自然",
-  "山脉",
-  "海洋",
-  "城市",
-  "建筑",
-  "动漫",
-  "科幻",
-  "奇幻",
-  "夜景",
-  "动物",
-  "花卉",
-  "抽象",
-  "极简",
-  "其他",
+  "自然风光",
+  "城市建筑",
+  "极简设计",
+  "动漫二次元",
+  "科技未来",
+  "艺术创意",
+  "治愈系",
+  "暗黑风",
+  "美女写真",
+  "可爱萌宠",
+  "古风国风",
+  "节日氛围",
 ] as const;
 
 export function getDisplayUrl(wallpaper: { url: string; thumbnail_url: string | null }): string {
