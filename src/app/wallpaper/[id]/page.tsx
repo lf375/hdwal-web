@@ -9,7 +9,7 @@ import Footer from "@/components/Footer";
 import IPhoneFrame from "@/components/iPhoneFrame";
 import WallpaperCard from "@/components/WallpaperCard";
 import { Download, ArrowLeft, Tag, X, Maximize2, Calendar, HardDrive, Maximize } from "lucide-react";
-import { stringToTags, formatDate, formatCount, formatFileSize, getApiUrl, cn } from "@/lib/utils";
+import { stringToTags, formatDate, formatCount, formatFileSize, getApiUrl, getDisplayUrl, cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Wallpaper, ApiResponse } from "@/lib/types";
 
@@ -153,7 +153,7 @@ export default function WallpaperDetailPage() {
                   <div className="relative w-full h-full cursor-zoom-in group">
                     {wallpaper.url ? (
                       <Image
-                        src={wallpaper.url}
+                        src={getDisplayUrl(wallpaper)}
                         alt={wallpaper.title}
                         fill
                         sizes="280px"
@@ -177,7 +177,7 @@ export default function WallpaperDetailPage() {
                 >
                   {wallpaper.url ? (
                     <Image
-                      src={wallpaper.url}
+                      src={getDisplayUrl(wallpaper)}
                       alt={wallpaper.title}
                       fill
                       sizes="(max-width: 1024px) 100vw, 60vw"
