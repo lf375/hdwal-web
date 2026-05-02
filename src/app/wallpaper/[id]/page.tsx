@@ -140,9 +140,10 @@ export default function WallpaperDetailPage() {
         >
           <Link
             href="/"
-            className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-surface border border-border hover:bg-surface-hover hover:border-foreground/30 transition-colors mb-4"
+            className="inline-flex items-center gap-1 text-sm text-text-tertiary hover:text-foreground transition-colors mb-4"
           >
             <ArrowLeft className="w-4 h-4" />
+            返回
           </Link>
 
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
