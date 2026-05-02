@@ -164,30 +164,30 @@ function HomeContentInner() {
 
   return (
     <div className="pt-14 flex-1">
-      <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto pt-8">
-        <div className="relative overflow-hidden rounded-2xl h-[180px] sm:h-[200px]">
+      <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto pt-6 sm:pt-8">
+        <div className="relative overflow-hidden rounded-xl sm:rounded-2xl h-[120px] sm:h-[180px] lg:h-[200px]">
           <div className="absolute inset-0 bg-gradient-to-br from-indigo-100 via-white to-purple-50" />
           <div className="absolute inset-0">
             <div className="absolute -top-20 -right-20 w-60 h-60 bg-gradient-to-br from-indigo-200/60 to-purple-200/40 rounded-full blur-2xl animate-pulse" />
             <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-gradient-to-tr from-violet-200/50 to-indigo-200/50 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '1s' }} />
-            <div className="absolute top-1/2 left-1/3 w-32 h-32 bg-gradient-to-br from-blue-200/30 to-transparent rounded-full blur-xl animate-pulse" style={{ animationDelay: '2s' }} />
+            <div className="absolute top-1/2 left-1/3 w-32 h-32 bg-gradient-to-br from-blue-200/30 to-transparent rounded-full blur-xl animate-pulse hidden sm:block" style={{ animationDelay: '2s' }} />
           </div>
-          <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute inset-0 overflow-hidden hidden sm:block">
             <div className="absolute top-0 right-8 w-32 h-32 border border-indigo-200/30 rotate-12" />
             <div className="absolute bottom-4 left-8 w-24 h-24 border border-indigo-200/20 rotate-45" />
             <div className="absolute top-12 right-1/4 w-3 h-3 bg-indigo-300/40 rotate-45" />
             <div className="absolute bottom-16 right-16 w-2 h-2 bg-purple-300/50 rotate-45" />
           </div>
 
-          <div className="relative z-10 h-full flex flex-col justify-center px-8 sm:px-12 lg:px-16">
-            <h1 className="text-lg sm:text-xl lg:text-2xl font-semibold text-foreground">
+          <div className="relative z-10 h-full flex flex-col justify-center px-5 sm:px-8 lg:px-16">
+            <h1 className="text-base sm:text-lg lg:text-2xl font-semibold text-foreground">
               精选高清壁纸素材库
             </h1>
-            <p className="text-text-tertiary text-xs sm:text-sm mt-2">
+            <p className="text-text-tertiary text-xs sm:text-sm mt-1 sm:mt-2">
               AI 智能创作 · 每日更新 · 免费下载
             </p>
 
-            <div className="flex flex-wrap items-center gap-4 sm:gap-6 mt-6 sm:mt-8">
+            <div className="hidden sm:flex flex-wrap items-center gap-4 lg:gap-6 mt-4 lg:mt-8">
               <div className="group flex items-center gap-2 cursor-pointer">
                 <span className="w-5 h-5 rounded-full bg-indigo-400/20 flex items-center justify-center">
                   <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />

@@ -8,10 +8,12 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import IPhoneFrame from "@/components/iPhoneFrame";
 import WallpaperCard from "@/components/WallpaperCard";
-import { Download, ArrowLeft, Tag, X, Maximize2 } from "lucide-react";
-import { stringToTags, formatDate, formatCount, formatFileSize, getApiUrl } from "@/lib/utils";
+import { Download, ArrowLeft, Tag, X, Maximize2, Calendar, HardDrive, Maximize } from "lucide-react";
+import { stringToTags, formatDate, formatCount, formatFileSize, getApiUrl, cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Wallpaper, ApiResponse } from "@/lib/types";
+
+export const runtime = "edge";
 
 export default function WallpaperDetailPage() {
   const params = useParams();
@@ -36,21 +38,19 @@ export default function WallpaperDetailPage() {
         if (wp) {
           fetch(getApiUrl(`/${id}`), {
             method: 'PATCH',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'internal-view'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: 'view' }),
             signal: controller.signal
           }).catch(() => {});
 
-          fetch(getApiUrl("/", { limit: "12", page: "1" }), { signal: controller.signal })
+          const orientation = (wp.height > wp.width && wp.width > 0) ? 'portrait' : 'landscape';
+          fetch(getApiUrl("/", { limit: "16", page: "1", orientation }), { signal: controller.signal })
             .then((r) => r.json())
             .then((data: ApiResponse) => {
               if (controller.signal.aborted) return;
               const similar = (data.data?.list || [])
                 .filter((w: Wallpaper) => String(w.id) !== String(id))
-                .slice(0, 8);
+                .slice(0, 10);
               setSimilarWallpapers(similar);
             })
             .catch(() => { if (!controller.signal.aborted) setSimilarWallpapers([]); });
@@ -74,10 +74,7 @@ export default function WallpaperDetailPage() {
     try {
       fetch(getApiUrl(`/${wallpaper.id}`), {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'internal-download'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'download' })
       }).catch(() => {});
 
@@ -99,31 +96,14 @@ export default function WallpaperDetailPage() {
     return (
       <main className="min-h-screen">
         <Navbar />
-        <div className="pt-24 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-          <div className="h-4 w-20 rounded animate-shimmer mb-6" />
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+        <div className="pt-20 pb-12 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+          <div className="h-4 w-20 rounded animate-shimmer mb-4" />
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
             <div className="lg:col-span-3">
-              <div className="aspect-video rounded-2xl animate-shimmer" />
+              <div className="aspect-video rounded-xl animate-shimmer" />
             </div>
             <div className="lg:col-span-2 space-y-4">
-              <div className="bg-surface border border-border/60 rounded-2xl p-6 h-24 animate-shimmer" />
-              <div className="bg-surface rounded-2xl p-6 border border-border/60 space-y-4">
-                <div className="h-7 w-3/4 rounded animate-shimmer" />
-                <div className="h-4 w-1/3 rounded animate-shimmer" />
-                <div className="h-11 w-full rounded-xl animate-shimmer" />
-                <div className="flex gap-4">
-                  <div className="h-4 w-20 rounded animate-shimmer" />
-                  <div className="h-4 w-16 rounded animate-shimmer" />
-                </div>
-                <div className="pt-4 space-y-2">
-                  <div className="h-3 w-10 rounded animate-shimmer" />
-                  <div className="flex gap-2">
-                    <div className="h-6 w-14 rounded-full animate-shimmer" />
-                    <div className="h-6 w-14 rounded-full animate-shimmer" />
-                    <div className="h-6 w-14 rounded-full animate-shimmer" />
-                  </div>
-                </div>
-              </div>
+              <div className="bg-surface border border-border/60 rounded-xl p-5 animate-shimmer" />
             </div>
           </div>
         </div>
@@ -136,11 +116,9 @@ export default function WallpaperDetailPage() {
     return (
       <main className="min-h-screen">
         <Navbar />
-        <div className="pt-24 pb-16 px-4 max-w-6xl mx-auto text-center">
+        <div className="pt-20 pb-12 px-4 max-w-4xl mx-auto text-center">
           <p className="text-text-secondary">壁纸未找到</p>
-          <Link href="/" className="text-accent mt-4 inline-block">
-            返回首页
-          </Link>
+          <Link href="/" className="text-accent mt-4 inline-block">返回首页</Link>
         </div>
         <Footer />
       </main>
@@ -154,7 +132,7 @@ export default function WallpaperDetailPage() {
     <main className="min-h-screen">
       <Navbar />
 
-      <div className="pt-24 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <div className="pt-20 pb-12 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -162,23 +140,23 @@ export default function WallpaperDetailPage() {
         >
           <Link
             href="/"
-            className="inline-flex items-center gap-1 text-sm text-text-secondary hover:text-accent transition-colors mb-6"
+            className="inline-flex items-center gap-1 text-sm text-text-secondary hover:text-accent transition-colors mb-4"
           >
             <ArrowLeft className="w-4 h-4" />
             返回首页
           </Link>
 
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
             <div className="lg:col-span-3">
               {isPortrait ? (
-                <IPhoneFrame onClick={() => setShowPreview(true)}>
+                <IPhoneFrame size="sm" onClick={() => setShowPreview(true)}>
                   <div className="relative w-full h-full cursor-zoom-in group">
                     {wallpaper.url ? (
                       <Image
                         src={wallpaper.url}
                         alt={wallpaper.title}
                         fill
-                        sizes="320px"
+                        sizes="280px"
                         className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
                         priority
                       />
@@ -186,15 +164,15 @@ export default function WallpaperDetailPage() {
                       <div className="absolute inset-0 animate-shimmer" />
                     )}
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 flex items-center justify-center">
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/50 backdrop-blur-sm p-3 rounded-full">
-                        <Maximize2 className="w-5 h-5 text-white" />
+                      <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/50 backdrop-blur-sm p-2.5 rounded-full">
+                        <Maximize2 className="w-4 h-4 text-white" />
                       </div>
                     </div>
                   </div>
                 </IPhoneFrame>
               ) : (
                 <div
-                  className="relative overflow-hidden rounded-2xl bg-muted cursor-zoom-in group aspect-video"
+                  className="relative overflow-hidden rounded-xl bg-muted cursor-zoom-in group aspect-video"
                   onClick={() => setShowPreview(true)}
                 >
                   {wallpaper.url ? (
@@ -210,64 +188,71 @@ export default function WallpaperDetailPage() {
                     <div className="absolute inset-0 animate-shimmer" />
                   )}
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 flex items-center justify-center">
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/50 backdrop-blur-sm p-3 rounded-full">
-                      <Maximize2 className="w-5 h-5 text-white" />
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/50 backdrop-blur-sm p-2.5 rounded-full">
+                      <Maximize2 className="w-4 h-4 text-white" />
                     </div>
                   </div>
                 </div>
               )}
             </div>
 
-            <div className="lg:col-span-2 space-y-6">
-              <div className="bg-surface border border-border/60 rounded-2xl p-6 mb-6 text-center">
-                <p className="text-sm text-text-tertiary">[广告位]</p>
-              </div>
-              <div className="bg-surface rounded-2xl p-6 border border-border/60">
-                <h1 className="font-heading text-2xl font-bold">
-                  {wallpaper.title}
-                </h1>
-                <p className="text-sm text-text-tertiary mt-1">
-                  {formatDate(wallpaper.created_at)}
-                </p>
+            <div className="lg:col-span-2">
+              <div className="bg-surface rounded-xl p-5 border border-border/60 space-y-5">
+                <div>
+                  <h1 className="font-heading text-xl font-bold leading-tight">{wallpaper.title}</h1>
+                  <div className="flex items-center gap-1 text-xs text-text-tertiary mt-2">
+                    <Calendar className="w-3 h-3" />
+                    {formatDate(wallpaper.created_at)}
+                  </div>
+                </div>
 
                 <button
                   onClick={handleDownload}
-                  className="w-full mt-4 inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-accent text-white font-semibold text-sm hover:bg-accent-dark transition-colors"
+                  className="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-accent text-white font-medium text-sm hover:bg-accent-dark transition-colors"
                 >
                   <Download className="w-4 h-4" />
                   下载壁纸
                 </button>
 
-                <div className="flex items-center gap-4 text-sm text-text-secondary mt-4">
-                  <span className="flex items-center gap-1">
-                    <Download className="w-3.5 h-3.5" />
-                    {formatCount(wallpaper.download_count)} 下载
-                  </span>
+                <div className="grid grid-cols-3 gap-3 py-3 border-y border-border/60">
+                  <div className="text-center">
+                    <div className="flex items-center justify-center gap-1 text-text-tertiary mb-1">
+                      <Download className="w-3 h-3" />
+                    </div>
+                    <p className="text-sm font-medium">{formatCount(wallpaper.download_count)}</p>
+                    <p className="text-xs text-text-tertiary">下载</p>
+                  </div>
                   {wallpaper.width > 0 && wallpaper.height > 0 && (
-                    <span className="text-text-tertiary">
-                      {wallpaper.width} × {wallpaper.height}
-                    </span>
+                    <div className="text-center">
+                      <div className="flex items-center justify-center gap-1 text-text-tertiary mb-1">
+                        <Maximize className="w-3 h-3" />
+                      </div>
+                      <p className="text-sm font-medium">{wallpaper.width}×{wallpaper.height}</p>
+                      <p className="text-xs text-text-tertiary">分辨率</p>
+                    </div>
                   )}
                   {wallpaper.file_size > 0 && (
-                    <span className="text-text-tertiary">
-                      {formatFileSize(wallpaper.file_size)}
-                    </span>
+                    <div className="text-center">
+                      <div className="flex items-center justify-center gap-1 text-text-tertiary mb-1">
+                        <HardDrive className="w-3 h-3" />
+                      </div>
+                      <p className="text-sm font-medium">{formatFileSize(wallpaper.file_size)}</p>
+                      <p className="text-xs text-text-tertiary">大小</p>
+                    </div>
                   )}
                 </div>
 
                 {tags.length > 0 && (
-                  <div className="mt-6">
-                    <h3 className="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-2">
-                      标签
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
+                  <div>
+                    <h3 className="text-xs font-medium text-text-tertiary mb-2">标签</h3>
+                    <div className="flex flex-wrap gap-1.5">
                       {tags.map((tag) => (
                         <Link
                           key={tag}
                           href={`/?tag=${encodeURIComponent(tag.trim())}`}
-                          className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-accent/10 text-accent text-xs font-medium hover:bg-accent/20 transition-colors"
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-muted text-text-secondary text-xs hover:bg-accent/10 hover:text-accent transition-colors"
                         >
-                          <Tag className="w-3 h-3" />
+                          <Tag className="w-2.5 h-2.5" />
                           {tag.trim()}
                         </Link>
                       ))}
@@ -276,11 +261,9 @@ export default function WallpaperDetailPage() {
                 )}
 
                 {wallpaper.prompt && (
-                  <div className="mt-6">
-                    <h3 className="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-2">
-                      AI 提示词
-                    </h3>
-                    <p className="text-sm text-text-secondary leading-relaxed bg-muted/50 rounded-lg p-3">
+                  <div>
+                    <h3 className="text-xs font-medium text-text-tertiary mb-2">AI 提示词</h3>
+                    <p className="text-xs text-text-secondary leading-relaxed bg-muted/50 rounded-lg p-3">
                       {wallpaper.prompt}
                     </p>
                   </div>
@@ -290,11 +273,16 @@ export default function WallpaperDetailPage() {
           </div>
 
           {similarWallpapers.length > 0 && (
-            <div className="mt-12 pt-8 border-t border-border/60">
-              <h2 className="text-xl font-semibold text-foreground mb-6">猜你喜欢</h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            <div className="mt-10 pt-6 border-t border-border/60">
+              <h2 className="text-lg font-semibold text-foreground mb-4">猜你喜欢</h2>
+              <div className={cn(
+                "grid gap-3",
+                isPortrait
+                  ? "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
+                  : "grid-cols-2 sm:grid-cols-3 md:grid-cols-4"
+              )}>
                 {similarWallpapers.map((wp) => (
-                  <WallpaperCard key={wp.id} wallpaper={wp} />
+                  <WallpaperCard key={wp.id} wallpaper={wp} orientation={isPortrait ? "portrait" : "landscape"} />
                 ))}
               </div>
             </div>
