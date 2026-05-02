@@ -1,7 +1,5 @@
 "use client";
 
-export const runtime = "edge";
-
 import { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
@@ -11,7 +9,7 @@ import Footer from "@/components/Footer";
 import IPhoneFrame from "@/components/iPhoneFrame";
 import WallpaperCard from "@/components/WallpaperCard";
 import { Download, ArrowLeft, Tag, X, Maximize2 } from "lucide-react";
-import { stringToTags, formatDate, formatCount, formatFileSize, cn, getApiUrl, getDisplayUrl } from "@/lib/utils";
+import { stringToTags, formatDate, formatCount, formatFileSize, getApiUrl, getDisplayUrl } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Wallpaper, ApiResponse } from "@/lib/types";
 
@@ -25,41 +23,77 @@ export default function WallpaperDetailPage() {
 
   useEffect(() => {
     if (!id) return;
-    let cancelled = false;
+    const controller = new AbortController();
 
-    fetch(getApiUrl(`/${id}`))
+    fetch(getApiUrl(`/${id}`), { signal: controller.signal })
       .then((r) => r.json())
       .then((data) => {
-        if (cancelled) return;
+        if (controller.signal.aborted) return;
         const wp = data.data || data.wallpaper || null;
         setWallpaper(wp);
         setLoading(false);
 
         if (wp) {
-          fetch(getApiUrl("/", { limit: "12", page: "1" }))
+          fetch(getApiUrl(`/${id}`), {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'internal-view'
+            },
+            body: JSON.stringify({ action: 'view' }),
+            signal: controller.signal
+          }).catch(() => {});
+
+          fetch(getApiUrl("/", { limit: "12", page: "1" }), { signal: controller.signal })
             .then((r) => r.json())
             .then((data: ApiResponse) => {
-              if (cancelled) return;
+              if (controller.signal.aborted) return;
               const similar = (data.data?.list || [])
                 .filter((w: Wallpaper) => String(w.id) !== String(id))
                 .slice(0, 8);
               setSimilarWallpapers(similar);
             })
-            .catch(() => { if (!cancelled) setSimilarWallpapers([]); });
+            .catch(() => { if (!controller.signal.aborted) setSimilarWallpapers([]); });
         }
       })
-      .catch(() => { if (!cancelled) setLoading(false); });
-    return () => { cancelled = true; };
+      .catch(() => { if (!controller.signal.aborted) setLoading(false); });
+    return () => { controller.abort(); };
   }, [id]);
 
-  const handleDownload = async () => {
+  useEffect(() => {
+    if (!showPreview) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShowPreview(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showPreview]);
+
+  const handleDownload = useCallback(async () => {
     if (!wallpaper) return;
     try {
-      window.open(wallpaper.url, "_blank");
+      fetch(getApiUrl(`/${wallpaper.id}`), {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'internal-download'
+        },
+        body: JSON.stringify({ action: 'download' })
+      }).catch(() => {});
+
+      const link = document.createElement('a');
+      link.href = wallpaper.url;
+      link.download = `${wallpaper.title || 'wallpaper'}.jpg`;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     } catch (err) {
       console.error(err);
+      window.open(wallpaper.url, "_blank");
     }
-  };
+  }, [wallpaper]);
 
   if (loading) {
     return (

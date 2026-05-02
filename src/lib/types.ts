@@ -19,7 +19,8 @@ export interface Wallpaper {
 
 export interface ApiResponse {
   success: boolean;
-  data: {
+  error?: string;
+  data?: {
     list: Wallpaper[];
     pagination: {
       page: number;

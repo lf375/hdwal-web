@@ -1,40 +1,93 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef, Suspense } from "react";
+import { useEffect, useReducer, useCallback, useRef, Suspense } from "react";
 import WallpaperCard from "@/components/WallpaperCard";
 import { useSearchParams } from "next/navigation";
 import { TAGS, cn, getApiUrl } from "@/lib/utils";
-import { ArrowUp } from "lucide-react";
+import { ArrowUp, AlertCircle } from "lucide-react";
 import type { Wallpaper, ApiResponse } from "@/lib/types";
+
+interface State {
+  wallpapers: Wallpaper[];
+  loading: boolean;
+  loadingMore: boolean;
+  error: string | null;
+  page: number;
+  hasMore: boolean;
+  showScrollTop: boolean;
+}
+
+type Action =
+  | { type: "FETCH_START"; append: boolean }
+  | { type: "FETCH_SUCCESS"; wallpapers: Wallpaper[]; append: boolean; totalPages: number; page: number }
+  | { type: "FETCH_ERROR"; error: string; append: boolean }
+  | { type: "SET_SCROLL_TOP"; value: boolean };
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case "FETCH_START":
+      return {
+        ...state,
+        loading: action.append ? state.loading : true,
+        loadingMore: action.append,
+        error: null,
+      };
+    case "FETCH_SUCCESS":
+      return {
+        ...state,
+        loading: false,
+        loadingMore: false,
+        wallpapers: action.append
+          ? [...state.wallpapers, ...action.wallpapers]
+          : action.wallpapers,
+        hasMore: action.page < action.totalPages,
+        page: action.page,
+      };
+    case "FETCH_ERROR":
+      return {
+        ...state,
+        loading: false,
+        loadingMore: false,
+        wallpapers: action.append ? state.wallpapers : [],
+        error: action.append ? state.error : action.error,
+      };
+    case "SET_SCROLL_TOP":
+      return { ...state, showScrollTop: action.value };
+    default:
+      return state;
+  }
+}
+
+const initialState: State = {
+  wallpapers: [],
+  loading: true,
+  loadingMore: false,
+  error: null,
+  page: 1,
+  hasMore: true,
+  showScrollTop: false,
+};
 
 function HomeContentInner() {
   const searchParams = useSearchParams();
-  const [wallpapers, setWallpapers] = useState<Wallpaper[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [activeTag, setActiveTag] = useState(searchParams.get("tag") || "all");
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const [activeTag, setActiveTag] = useReducer((s: string, a: string) => a, searchParams.get("tag") || "all");
   const orientation = searchParams.get("orientation") || "landscape";
+  const search = searchParams.get("search") || "";
 
   const LIMIT = 20;
   const abortRef = useRef<AbortController | null>(null);
-  const searchRef = useRef(searchParams.get("search") || "");
+  const fetchIdRef = useRef(0);
 
-  useEffect(() => {
-    searchRef.current = searchParams.get("search") || "";
-  });
-
-  const doFetch = useCallback(async (tag: string, pageNum: number, append: boolean, ori: string) => {
+  const doFetch = useCallback(async (tag: string, pageNum: number, append: boolean, ori: string, searchQuery: string) => {
     if (abortRef.current) {
       abortRef.current.abort();
     }
     const controller = new AbortController();
     abortRef.current = controller;
+    const fetchId = ++fetchIdRef.current;
 
-    if (append) setLoadingMore(true);
-    else setLoading(true);
+    dispatch({ type: "FETCH_START", append });
 
     try {
       const params: Record<string, string> = {
@@ -43,52 +96,63 @@ function HomeContentInner() {
       };
       if (tag !== "all") params.tag = tag;
       if (ori && ori !== "all") params.orientation = ori;
+      if (searchQuery) params.search = searchQuery;
 
       const res = await fetch(getApiUrl("/", params), { signal: controller.signal });
       if (controller.signal.aborted) return;
       const data: ApiResponse = await res.json();
 
-      if (append) {
-        setWallpapers(prev => [...prev, ...(data.data?.list || [])]);
-      } else {
-        setWallpapers(data.data?.list || []);
+      if (!res.ok) {
+        throw new Error(data.error || "请求失败");
       }
-      const totalPages = data.data?.pagination?.totalPages || 0;
-      setHasMore(pageNum < totalPages);
-      setPage(pageNum);
-    } catch (err) {
+
+      if (fetchId !== fetchIdRef.current) return;
+
+      dispatch({
+        type: "FETCH_SUCCESS",
+        wallpapers: data.data?.list || [],
+        append,
+        totalPages: data.data?.pagination?.totalPages || 0,
+        page: pageNum,
+      });
+    } catch (err: unknown) {
       if (controller.signal.aborted) return;
+      if (fetchId !== fetchIdRef.current) return;
       console.error(err);
-      if (!append) setWallpapers([]);
-    } finally {
-      if (!controller.signal.aborted) {
-        if (append) setLoadingMore(false);
-        else setLoading(false);
-      }
+      const message = err instanceof Error ? err.message : "加载失败，请重试";
+      dispatch({ type: "FETCH_ERROR", error: message, append });
     }
   }, []);
 
+  const fetchData = useCallback((tag: string, ori: string, searchQuery: string) => {
+    doFetch(tag, 1, false, ori, searchQuery);
+  }, [doFetch]);
+
   useEffect(() => {
-    doFetch(activeTag, 1, false, orientation);
+    fetchData(activeTag, orientation, search);
     return () => {
       if (abortRef.current) {
         abortRef.current.abort();
       }
     };
-  }, [activeTag, orientation, doFetch]);
+  }, [activeTag, orientation, search, fetchData]);
 
   const handleTagChange = useCallback((tag: string) => {
     setActiveTag(tag);
   }, []);
 
   const handleLoadMore = () => {
-    if (loadingMore || !hasMore) return;
-    doFetch(activeTag, page + 1, true, orientation);
+    if (state.loadingMore || !state.hasMore) return;
+    doFetch(activeTag, state.page + 1, true, orientation, search);
+  };
+
+  const handleRetry = () => {
+    doFetch(activeTag, 1, false, orientation, search);
   };
 
   useEffect(() => {
     const handleScroll = () => {
-      setShowScrollTop(window.scrollY > 400);
+      dispatch({ type: "SET_SCROLL_TOP", value: window.scrollY > 400 });
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -184,7 +248,7 @@ function HomeContentInner() {
       </section>
 
       <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto pb-12">
-        {loading ? (
+        {state.loading ? (
           <div className={cn(
             "grid gap-4",
             orientation === "portrait"
@@ -198,7 +262,18 @@ function HomeContentInner() {
               )} />
             ))}
           </div>
-        ) : wallpapers.length > 0 ? (
+        ) : state.error ? (
+          <div className="text-center py-20">
+            <AlertCircle className="w-10 h-10 text-text-tertiary mx-auto mb-3" />
+            <p className="text-text-secondary text-sm mb-4">{state.error}</p>
+            <button
+              onClick={handleRetry}
+              className="px-6 py-2 rounded-xl border border-border text-sm font-medium text-text-secondary hover:text-foreground hover:border-foreground/20 transition-colors"
+            >
+              重试
+            </button>
+          </div>
+        ) : state.wallpapers.length > 0 ? (
           <>
             <div className={cn(
               "grid gap-4",
@@ -206,19 +281,19 @@ function HomeContentInner() {
                 ? "grid-cols-2 sm:grid-cols-3 md:grid-cols-4"
                 : "grid-cols-2 sm:grid-cols-3"
             )}>
-              {wallpapers.map((wp) => (
+              {state.wallpapers.map((wp) => (
                 <WallpaperCard key={wp.id} wallpaper={wp} orientation={orientation as "landscape" | "portrait"} />
               ))}
             </div>
 
             <div className="mt-8 text-center">
-              {hasMore ? (
+              {state.hasMore ? (
                 <button
                   onClick={handleLoadMore}
-                  disabled={loadingMore}
+                  disabled={state.loadingMore}
                   className="px-8 py-2.5 rounded-xl border border-border text-sm font-medium text-text-secondary hover:text-foreground hover:border-foreground/20 transition-colors disabled:opacity-50"
                 >
-                  {loadingMore ? "加载中..." : "加载更多"}
+                  {state.loadingMore ? "加载中..." : "加载更多"}
                 </button>
               ) : (
                 <p className="text-text-tertiary text-sm">没有更多了</p>
@@ -232,7 +307,7 @@ function HomeContentInner() {
         )}
       </section>
 
-      {showScrollTop && (
+      {state.showScrollTop && (
         <button
           onClick={scrollToTop}
           className="fixed bottom-28 right-6 z-50 p-3 rounded-lg bg-foreground text-background shadow-lg hover:bg-foreground/90 transition-all hover:scale-105"
