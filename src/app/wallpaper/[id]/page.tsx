@@ -8,7 +8,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import IPhoneFrame from "@/components/iPhoneFrame";
 import WallpaperCard from "@/components/WallpaperCard";
-import { Download, ArrowLeft, Tag, X, Maximize2, Calendar, HardDrive, Maximize } from "lucide-react";
+import { Download, ArrowLeft, Tag, X, Maximize2, Calendar, HardDrive, Maximize, Eye } from "lucide-react";
 import { stringToTags, formatDate, formatCount, formatFileSize, getApiUrl, getDisplayUrl, cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Wallpaper, ApiResponse } from "@/lib/types";
@@ -214,7 +214,14 @@ export default function WallpaperDetailPage() {
                   下载壁纸
                 </button>
 
-                <div className="grid grid-cols-3 gap-3 py-3 border-y border-border/60">
+                <div className="grid grid-cols-4 gap-2 py-3 border-y border-border/60">
+                  <div className="text-center">
+                    <div className="flex items-center justify-center gap-1 text-text-tertiary mb-1">
+                      <Eye className="w-3 h-3" />
+                    </div>
+                    <p className="text-sm font-medium">{formatCount(wallpaper.view_count)}</p>
+                    <p className="text-xs text-text-tertiary">浏览</p>
+                  </div>
                   <div className="text-center">
                     <div className="flex items-center justify-center gap-1 text-text-tertiary mb-1">
                       <Download className="w-3 h-3" />

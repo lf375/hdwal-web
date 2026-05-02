@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Download } from "lucide-react";
+import { Download, Eye } from "lucide-react";
 import { formatCount, getDisplayUrl, cn } from "@/lib/utils";
 import type { Wallpaper } from "@/lib/types";
 
@@ -56,10 +56,14 @@ export default function WallpaperCard({ wallpaper, orientation = "landscape" }: 
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
           <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-2 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none">
             <p className="text-white text-xs font-medium truncate mb-1 drop-shadow-md">{wallpaper.title}</p>
-            <div className="flex items-center gap-3 text-white/80 text-xs">
-              <span className="flex items-center gap-0.5 drop-shadow-md">
-                <Download className="w-3 h-3" />
-                {formatCount(wallpaper.download_count)}
+            <div className="flex items-baseline gap-3 text-white/80 text-xs leading-none">
+              <span className="inline-flex items-baseline gap-0.5 drop-shadow-md">
+                <Eye className="w-3 h-3 self-center" />
+                <span className="leading-none">{formatCount(wallpaper.view_count)}</span>
+              </span>
+              <span className="inline-flex items-baseline gap-0.5 drop-shadow-md">
+                <Download className="w-3 h-3 self-center" />
+                <span className="leading-none">{formatCount(wallpaper.download_count)}</span>
               </span>
             </div>
           </div>
