@@ -35,11 +35,14 @@ function NavbarContent() {
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-xl border-b border-border/60">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
         <div className="flex items-center gap-6">
-          <Link href="/" className="flex items-center gap-0.5 select-none">
+          <button
+            onClick={() => { window.location.href = window.location.origin; }}
+            className="flex items-center gap-0.5 select-none cursor-pointer"
+          >
             <span className="font-heading text-xl font-black tracking-tighter text-foreground">
               HD<span className="text-accent">wal</span>
             </span>
-          </Link>
+          </button>
 
           <div className="hidden md:flex items-center gap-3">
             <button
