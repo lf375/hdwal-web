@@ -44,7 +44,13 @@ export default function WallpaperDetailPage() {
           }).catch(() => {});
 
           const orientation = (wp.height > wp.width && wp.width > 0) ? 'portrait' : 'landscape';
-          fetch(getApiUrl("/", { limit: "16", page: "1", orientation }), { signal: controller.signal })
+          const tags = stringToTags(wp.tags);
+          const primaryTag = tags[0] || '';
+          
+          const recommendParams: Record<string, string> = { limit: "16", page: "1", orientation };
+          if (primaryTag) recommendParams.tag = primaryTag;
+          
+          fetch(getApiUrl("/", recommendParams), { signal: controller.signal })
             .then((r) => r.json())
             .then((data: ApiResponse) => {
               if (controller.signal.aborted) return;

@@ -75,7 +75,7 @@ function HomeContentInner() {
   const orientation = searchParams.get("orientation") || "landscape";
   const search = searchParams.get("search") || "";
 
-  const LIMIT = 20;
+  const LIMIT = 12;
   const abortRef = useRef<AbortController | null>(null);
   const fetchIdRef = useRef(0);
 
