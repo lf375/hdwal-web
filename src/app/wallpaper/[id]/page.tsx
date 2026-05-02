@@ -96,7 +96,7 @@ export default function WallpaperDetailPage() {
     return (
       <main className="min-h-screen">
         <Navbar />
-        <div className="pt-20 pb-12 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+        <div className="pt-20 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
           <div className="h-4 w-20 rounded animate-shimmer mb-4" />
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
             <div className="lg:col-span-3">
@@ -132,7 +132,7 @@ export default function WallpaperDetailPage() {
     <main className="min-h-screen">
       <Navbar />
 
-      <div className="pt-20 pb-12 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+      <div className="pt-20 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
