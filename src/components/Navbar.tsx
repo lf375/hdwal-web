@@ -25,11 +25,10 @@ function NavbarContent() {
   };
 
   const handleOrientationChange = (newOrientation: string) => {
-    if (newOrientation === orientation && !isDetailPage) return;
-    
     const params = new URLSearchParams(searchParams.toString());
     params.set("orientation", newOrientation);
-    router.push(`/?${params.toString()}`);
+    router.replace(`/?${params.toString()}`);
+    window.scrollTo(0, 0);
   };
 
   return (
