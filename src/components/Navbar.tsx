@@ -24,6 +24,14 @@ function NavbarContent() {
     }
   };
 
+  const handleOrientationChange = (newOrientation: string) => {
+    if (newOrientation === orientation && !isDetailPage) return;
+    
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("orientation", newOrientation);
+    router.push(`/?${params.toString()}`);
+  };
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-xl border-b border-border/60">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
@@ -36,7 +44,7 @@ function NavbarContent() {
 
           <div className="hidden md:flex items-center gap-3">
             <button
-              onClick={() => router.push("/?orientation=landscape")}
+              onClick={() => handleOrientationChange("landscape")}
               className={cn(
                 "flex items-center gap-1.5 text-sm transition-colors",
                 !isDetailPage && orientation === "landscape"
@@ -48,7 +56,7 @@ function NavbarContent() {
               桌面
             </button>
             <button
-              onClick={() => router.push("/?orientation=portrait")}
+              onClick={() => handleOrientationChange("portrait")}
               className={cn(
                 "flex items-center gap-1.5 text-sm transition-colors",
                 !isDetailPage && orientation === "portrait"
@@ -96,7 +104,7 @@ function NavbarContent() {
           <div className="px-4 py-3">
             <div className="flex gap-1 mb-4">
               <button
-                onClick={() => { router.push("/?orientation=landscape"); setMobileOpen(false); }}
+                onClick={() => { handleOrientationChange("landscape"); setMobileOpen(false); }}
                 className={cn(
                   "flex-1 px-3 py-2 rounded-md text-sm text-center flex items-center justify-center gap-1.5 transition-colors",
                   !isDetailPage && orientation === "landscape"
@@ -108,7 +116,7 @@ function NavbarContent() {
                 桌面
               </button>
               <button
-                onClick={() => { router.push("/?orientation=portrait"); setMobileOpen(false); }}
+                onClick={() => { handleOrientationChange("portrait"); setMobileOpen(false); }}
                 className={cn(
                   "flex-1 px-3 py-2 rounded-md text-sm text-center flex items-center justify-center gap-1.5 transition-colors",
                   !isDetailPage && orientation === "portrait"
