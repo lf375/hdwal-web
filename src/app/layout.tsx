@@ -17,7 +17,11 @@ const spaceGrotesk = Space_Grotesk({
 
 export const metadata: Metadata = {
   title: "HDwal - 高清壁纸",
-  description: "精选高清壁纸，免费下载，持续更新。",
+  description: "精选高清壁纸，免费下载，持续更新。提供 4K、2K 超清桌面壁纸、手机壁纸，涵盖自然风光、城市建筑、动漫二次元等多种风格。",
+  keywords: ["高清壁纸", "4K壁纸", "桌面壁纸", "手机壁纸", "免费壁纸", "壁纸下载", "HD wallpaper"],
+  alternates: {
+    canonical: "https://hdwal.com",
+  },
 };
 
 export default function RootLayout({
