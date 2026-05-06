@@ -55,13 +55,28 @@ export default function AboutPage() {
 
           <div>
             <h2 className="text-xl font-medium text-foreground mb-3">技术架构</h2>
-            <div className="text-text-secondary font-mono text-sm">
-              <p className="mb-1">Cloudflare 全球边缘网络</p>
-              <p className="pl-4">├─ Workers 无服务器计算 - 毫秒级响应</p>
-              <p className="pl-4">├─ R2 对象存储 - 全球加速分发</p>
-              <p className="pl-4">├─ D1 边缘数据库 - 低延迟查询</p>
-              <p className="pl-4">└─ 300+ 全球节点 - 就近访问</p>
-            </div>
+            <ul className="space-y-2 text-text-secondary">
+              <li className="flex items-start gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-accent mt-1.5 flex-shrink-0" />
+                <span>Cloudflare 全球边缘网络</span>
+              </li>
+              <li className="flex items-start gap-2 pl-4">
+                <span className="text-text-tertiary">├─</span>
+                <span>Workers 无服务器计算 - 毫秒级响应</span>
+              </li>
+              <li className="flex items-start gap-2 pl-4">
+                <span className="text-text-tertiary">├─</span>
+                <span>R2 对象存储 - 全球加速分发</span>
+              </li>
+              <li className="flex items-start gap-2 pl-4">
+                <span className="text-text-tertiary">├─</span>
+                <span>D1 边缘数据库 - 低延迟查询</span>
+              </li>
+              <li className="flex items-start gap-2 pl-4">
+                <span className="text-text-tertiary">└─</span>
+                <span>300+ 全球节点 - 就近访问</span>
+              </li>
+            </ul>
           </div>
 
           <div>
